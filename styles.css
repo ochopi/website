@@ -120,6 +120,11 @@ h1 {
   align-items: end;
 }
 
+.contact-item {
+  align-items: end;
+  text-align: center;
+}
+
 .contact-label {
   font-size: 0.8rem;
   color: var(--muted);
