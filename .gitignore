@@ -29,8 +29,7 @@ ENV/
 
 # ── Flet / build ──────────────────────────────────
 dist/
-# NO ignorar build/web:
-# lo necesitamos en Git para que Cloudflare lo publique.
+build/
 
 # ── Secretos y credenciales ───
 # (La regla más importante: )captura casi cualquier archivo de secretos)
