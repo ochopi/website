@@ -28,6 +28,7 @@ ENV/
 .ruff_cache/
 
 # ── Flet / build ──────────────────────────────────
+dist/
 # NO ignorar build/web:
 # lo necesitamos en Git para que Cloudflare lo publique.
 
