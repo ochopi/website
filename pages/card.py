@@ -1,15 +1,21 @@
 import flet as ft
 
 
-def social_icon(page: ft.Page, icon_name, url=None):
+def social_icon(icon_name, url=None):
     return ft.Container(
-        content=ft.Icon(icon_name, color="white", size=22),
+        content=ft.Icon(icon_name, color="white", size=25),
         width=48,
         height=48,
         border_radius=24,
-        border=ft.BorderRadius(1,1,1,1),
+        # bgcolor es necesario para que el círculo entero capture el click,
+        # no solo los pixeles del ícono (Flutter no "ve" un fondo transparente
+        # para hit-testing si no se declara explícitamente).
+        bgcolor="#18d341",
+        border=ft.Border.all(1, "#20164d"),
         alignment=ft.Alignment.CENTER,
-        on_click=(lambda e: page.launch_url(url)) if url else None,
+        # url abre el link de forma nativa (sin pasar por Python), evita
+        # el bloqueo de popup por delay que sí ocurre con on_click+launch_url.
+        url=url,
         ink=True,
     )
 
@@ -32,10 +38,11 @@ def check_item(text_str):
     )
 
 
-def build_card(page: ft.Page) -> ft.Container:
-    """Construye y devuelve el Container de la tarjeta de perfil."""
+def build_card(max_width: int = 380) -> ft.Container:
+    """Construye y devuelve el Container de la tarjeta de perfil.
+    No llama a ft.app() ni depende de `page` -- eso lo maneja main.py."""
     return ft.Container(
-        width=380,
+        width=max_width,
         padding=30,
         border_radius=28,
         gradient=ft.LinearGradient(
@@ -54,7 +61,7 @@ def build_card(page: ft.Page) -> ft.Container:
                     content=ft.Image(
                         src="rafael.jpg",
                         fit=ft.BoxFit.COVER,
-                        border_radius=ft.BorderRadius(90, 90, 90, 90), 
+                        border_radius=ft.BorderRadius.all(90),
                     ),
                 ),
 
@@ -74,14 +81,14 @@ def build_card(page: ft.Page) -> ft.Container:
 
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
-                    spacing=12,
+                    spacing=8,
                     controls=[
-                        social_icon(page, ft.Icons.PHONE, "tel:+50374196446"),
-                        social_icon(page, ft.Icons.MESSAGE, "https://wa.me/50374196446"),
-                        social_icon(page, ft.Icons.SEND, "https://t.me/ochopitech"),
-                        social_icon(page, ft.Icons.EMAIL, "mailto:rafael@ochopi.com"),
-                        social_icon(page, ft.Icons.CODE, "https://github.com/ochopi"),
-                        social_icon(page, ft.Icons.LANGUAGE, "https://ochopi.com"),
+                        social_icon(ft.Icons.PHONE, "tel:+50374196446"),
+                        social_icon(ft.Icons.MESSAGE, "https://wa.me/50374196446"),
+                        social_icon(ft.Icons.SEND, "https://t.me/ochopitech"),
+                        social_icon(ft.Icons.EMAIL, "mailto:rafael@ochopi.com"),
+                        social_icon(ft.Icons.CODE, "https://github.com/ochopi"),
+                        social_icon(ft.Icons.LANGUAGE, "https://ochopi.com"),
                     ],
                 ),
 
