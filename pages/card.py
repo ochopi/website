@@ -1,22 +1,64 @@
 import flet as ft
+from components.icons import icon_widget
+
+GRADIENT = ft.LinearGradient(
+    begin=ft.Alignment.TOP_CENTER,
+    end=ft.Alignment.BOTTOM_CENTER,
+    colors=["#5b2c8e", "#3d1a66"],
+)
+
+SOCIAL_LINKS = [
+    (ft.Icons.PHONE, "tel:+50374196446"),
+    ("sh:whatsapp-light.png", "https://wa.me/50374196446"),
+    (ft.Icons.SEND, "https://t.me/ochopitech"),
+    (ft.Icons.EMAIL, "mailto:rafael@ochopi.com"),
+    ("di:github-light.png", "https://github.com/ochopi"),
+    (ft.Icons.LANGUAGE, "https://ochopi.com"),
+]
+
+CHECKLIST_ITEMS = [
+    "Diagnóstico",
+    "Mantenimiento",
+    "Automatización",
+    "Windows OS",
+    "Linux OS",
+    "Self-Hosting",
+]
+
+PARAGRAPH_1 = (
+    "Trabajo con sistemas informáticos, realizando diagnóstico "
+    "y resolución de problemas de software y hardware."
+)
+PARAGRAPH_2 = (
+    "Me interesa la automatización y optimización de procesos, "
+    "así como la creación de soluciones prácticas para "
+    "problemas técnicos."
+)
 
 
-def social_icon(icon_name, url=None):
+# ---------- piezas compartidas ----------
+
+def social_icon(icon_ref, url=None):
     return ft.Container(
-        content=ft.Icon(icon_name, color="white", size=25),
+        content=icon_widget(icon_ref, size=22, color="white"),
         width=48,
         height=48,
         border_radius=24,
-        # bgcolor es necesario para que el círculo entero capture el click,
-        # no solo los pixeles del ícono (Flutter no "ve" un fondo transparente
-        # para hit-testing si no se declara explícitamente).
+        # bgcolor necesario para que el círculo entero capture el click,
+        # no solo los pixeles del ícono.
         bgcolor="#18d341",
         border=ft.Border.all(1, "#20164d"),
         alignment=ft.Alignment.CENTER,
-        # url abre el link de forma nativa (sin pasar por Python), evita
-        # el bloqueo de popup por delay que sí ocurre con on_click+launch_url.
         url=url,
         ink=True,
+    )
+
+
+def icons_row() -> ft.Row:
+    return ft.Row(
+        alignment=ft.MainAxisAlignment.CENTER,
+        spacing=12,
+        controls=[social_icon(icon, url) for icon, url in SOCIAL_LINKS],
     )
 
 
@@ -38,84 +80,115 @@ def check_item(text_str):
     )
 
 
-def build_card(max_width: int = 380) -> ft.Container:
-    """Construye y devuelve el Container de la tarjeta de perfil.
-    No llama a ft.app() ni depende de `page` -- eso lo maneja main.py."""
+def checklist_column() -> ft.Column:
+    return ft.Column(
+        spacing=10,
+        controls=[check_item(t) for t in CHECKLIST_ITEMS],
+    )
+
+
+def avatar(size: int = 180) -> ft.Container:
+    return ft.Container(
+        width=size,
+        height=size,
+        border_radius=size // 2,
+        content=ft.Image(
+            src="rafael.jpg",
+            fit=ft.BoxFit.COVER,
+            border_radius=ft.BorderRadius.all(size // 2),
+        ),
+    )
+
+
+def services_row(alignment=ft.MainAxisAlignment.CENTER) -> ft.Row:
+    return ft.Row(
+        alignment=alignment,
+        controls=[
+            ft.Text("Servicios Informáticos:", color="white", size=16),
+            ft.Text("ochopi tech", color="white", size=16,
+                    weight=ft.FontWeight.BOLD, italic=True),
+        ],
+    )
+
+
+def paragraph(text_str, align=ft.TextAlign.CENTER) -> ft.Text:
+    return ft.Text(text_str, color="white", size=16, text_align=align)
+
+
+# ---------- layout angosto (móvil / retrato) ----------
+
+def build_card_narrow(max_width: int = 380) -> ft.Container:
     return ft.Container(
         width=max_width,
         padding=30,
         border_radius=28,
-        gradient=ft.LinearGradient(
-            begin=ft.Alignment.TOP_CENTER,
-            end=ft.Alignment.BOTTOM_CENTER,
-            colors=["#5b2c8e", "#3d1a66"],
-        ),
+        gradient=GRADIENT,
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=18,
             controls=[
-                ft.Container(
-                    width=180,
-                    height=180,
-                    border_radius=90,
-                    content=ft.Image(
-                        src="rafael.jpg",
-                        fit=ft.BoxFit.COVER,
-                        border_radius=ft.BorderRadius.all(90),
-                    ),
-                ),
-
+                avatar(180),
                 ft.Text("RAFAEL", size=42, color="white", weight=ft.FontWeight.W_300),
-
                 ft.Text("+503 7419 6446", size=20, color="white",
                         weight=ft.FontWeight.BOLD),
+                services_row(),
+                icons_row(),
+                paragraph(PARAGRAPH_1),
+                paragraph(PARAGRAPH_2),
+                checklist_column(),
+            ],
+        ),
+    )
 
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[
-                        ft.Text("Servicios Informáticos:", color="white", size=16),
-                        ft.Text("ochopi tech", color="white", size=16,
-                                weight=ft.FontWeight.BOLD, italic=True),
-                    ],
-                ),
 
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    spacing=8,
-                    controls=[
-                        social_icon(ft.Icons.PHONE, "tel:+50374196446"),
-                        social_icon(ft.Icons.MESSAGE, "https://wa.me/50374196446"),
-                        social_icon(ft.Icons.SEND, "https://t.me/ochopitech"),
-                        social_icon(ft.Icons.EMAIL, "mailto:rafael@ochopi.com"),
-                        social_icon(ft.Icons.CODE, "https://github.com/ochopi"),
-                        social_icon(ft.Icons.LANGUAGE, "https://ochopi.com"),
-                    ],
-                ),
+# ---------- layout ancho (pc / tablet horizontal) ----------
 
-                ft.Text(
-                    "Trabajo con sistemas informáticos, realizando diagnóstico "
-                    "y resolución de problemas de software y hardware.",
-                    color="white", size=16, text_align=ft.TextAlign.CENTER,
-                ),
+def build_card_wide(max_width: int = 900) -> ft.Container:
+    header = ft.Row(
+        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        controls=[
+            ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.START,
+                spacing=8,
+                expand=True,
+                controls=[
+                    ft.Text("RAFAEL", size=42, color="white",
+                            weight=ft.FontWeight.W_300),
+                    ft.Text("+503 7419 6446", size=20, color="white",
+                            weight=ft.FontWeight.BOLD),
+                    services_row(alignment=ft.MainAxisAlignment.START),
+                ],
+            ),
+            avatar(170),
+        ],
+    )
 
-                ft.Text(
-                    "Me interesa la automatización y optimización de procesos, "
-                    "así como la creación de soluciones prácticas para "
-                    "problemas técnicos.",
-                    color="white", size=16, text_align=ft.TextAlign.CENTER,
-                ),
+    body = ft.Row(
+        vertical_alignment=ft.CrossAxisAlignment.START,
+        spacing=50,
+        controls=[
+            ft.Container(content=checklist_column(), expand=1),
+            ft.Column(
+                expand=2,
+                controls=[
+                    paragraph(PARAGRAPH_1),
+                    paragraph(PARAGRAPH_2),
+                ],
+            ),
+        ],
+    )
 
-                ft.Column(
-                    spacing=10,
-                    controls=[
-                        check_item("Diagnóstico"),
-                        check_item("Mantenimiento"),
-                        check_item("Automatización"),
-                        check_item("Windows OS"),
-                        check_item("Linux OS"),
-                        check_item("Self-Hosting"),
-                    ],
-                ),
+    return ft.Container(
+        width=max_width,
+        padding=40,
+        border_radius=28,
+        gradient=GRADIENT,
+        content=ft.Column(
+            spacing=28,
+            controls=[
+                header,
+                icons_row(),
+                body,
             ],
         ),
     )
