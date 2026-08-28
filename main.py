@@ -1,9 +1,5 @@
 import flet as ft
-from pages.card import build_card_narrow, build_card_wide
-
-# Breakpoint: por debajo de esto se usa el layout vertical (móvil/tablet en retrato); 
-# igual o por encima, el layout horizontal (pc/tablet apaisada).
-WIDE_BREAKPOINT = 700
+from pages.card import build_card
 
 def main(page: ft.Page):
     page.title = "ochopi.com"
@@ -11,24 +7,6 @@ def main(page: ft.Page):
     page.scroll = ft.ScrollMode.AUTO
     page.padding = 0
 
-    def card_page_content() -> ft.Control:
-        screen_width = page.width or 380
-        is_wide = screen_width >= WIDE_BREAKPOINT
-
-        if is_wide:
-            # deja margen a los lados, tope de 900px para que no se estire demasiado en monitores enormes
-            card_width = min(900, screen_width - 64)
-            card = build_card_wide(max_width=card_width)
-        else:
-            card_width = min(380, screen_width - 32)
-            card = build_card_narrow(max_width=card_width)
-
-        return ft.Container(
-            content=card,
-            alignment=ft.Alignment.CENTER,
-            expand=True,
-            padding=ft.Padding.symmetric(vertical=24, horizontal=16),
-        )
 
     def route_change():
         page.views.clear()
@@ -37,7 +15,7 @@ def main(page: ft.Page):
         page.views.append(
             ft.View(
                 route="/",
-                controls=[card_page_content()],
+                controls=[build_card(page.width)],
                 bgcolor="#1a0f2e",
                 padding=0,
                 scroll=ft.ScrollMode.AUTO,
@@ -49,7 +27,7 @@ def main(page: ft.Page):
             page.views.append(
                 ft.View(
                     route="/card",
-                    controls=[card_page_content()],
+                    controls=[build_card(page.width)],
                     bgcolor="#1a0f2e",
                     padding=0,
                     scroll=ft.ScrollMode.AUTO,

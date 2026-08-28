@@ -7,6 +7,7 @@ GRADIENT = ft.LinearGradient(
     colors=["#5b2c8e", "#3d1a66"],
 )
 
+# ---------- datos del card ----------
 SOCIAL_LINKS = [
     (ft.Icons.PHONE, "tel:+50374196446"),
     ("sh:whatsapp-light.png", "https://wa.me/50374196446"),
@@ -38,54 +39,70 @@ PARAGRAPH_2 = (
 
 # ---------- piezas compartidas ----------
 
-def social_icon(icon_ref, url=None):
+def build_icon(icon=ft.Icons.CHECK, url=None, size=16, color="white", bgcolor="#7cb342", width=24, height=24, border=ft.Border.all(1, "#20164d"), border_radius=6, alignment=ft.Alignment.CENTER, ink=True) -> ft.Container:
     return ft.Container(
-        content=icon_widget(icon_ref, size=22, color="white"),
-        width=48,
-        height=48,
-        border_radius=24,
-        # bgcolor necesario para que el círculo entero capture el click,
-        # no solo los pixeles del ícono.
-        bgcolor="#18d341",
-        border=ft.Border.all(1, "#20164d"),
-        alignment=ft.Alignment.CENTER,
+        content=icon_widget(icon, size=size, color=color),
+        bgcolor=bgcolor,
+        width=width,
+        height=height,
+        border=border,
+        border_radius=border_radius,
+        alignment=alignment,
         url=url,
-        ink=True,
+        ink=ink,
     )
 
+def icons_row(spacing=12, alignment=ft.MainAxisAlignment.CENTER, size=16, color="white", bgcolor="#7cb342", width=24, height=24, border=ft.Border.all(1, "#20164d"), border_radius=6, icon_alignment=ft.Alignment.CENTER, ink=True) -> ft.Row:
+    controls_list = []
+    for icon, url in SOCIAL_LINKS:
+        row = build_icon(
+            icon=icon,
+            url=url, 
+            size=size, 
+            color=color, 
+            bgcolor=bgcolor,
+            width=width,
+            height=height,
+            border=border,
+            border_radius=border_radius,
+            alignment=icon_alignment,
+            ink=ink,
+        )
+        controls_list.append(row)
 
-def icons_row() -> ft.Row:
     return ft.Row(
-        alignment=ft.MainAxisAlignment.CENTER,
-        spacing=12,
-        controls=[social_icon(icon, url) for icon, url in SOCIAL_LINKS],
+        spacing=spacing,
+        alignment=alignment,
+        controls=controls_list,
     )
 
-
-def check_item(text_str):
+def checklist_row(text_str, spacing=10, size=14, color="white", icon_bgcolor="#7cb342", icon=ft.Icons.CHECK, icon_width=20, icon_height=20, icon_border_radius=6, icon_alignment=ft.Alignment.CENTER) -> ft.Row:
     return ft.Row(
+        spacing=spacing,
         controls=[
-            ft.Container(
-                content=ft.Icon(ft.Icons.CHECK, color="white", size=16),
-                width=24,
-                height=24,
-                bgcolor="#7cb342",
-                border_radius=6,
-                alignment=ft.Alignment.CENTER,
-            ),
-            ft.Text(text_str, color="white", size=18, weight=ft.FontWeight.BOLD,
-                     italic=True),
+            build_icon(icon=icon, size=size, color=color, bgcolor=icon_bgcolor, width=icon_width, height=icon_height, border_radius=icon_border_radius, alignment=icon_alignment),
+            ft.Text(text_str,  size=size, color=color, weight=ft.FontWeight.BOLD, italic=True),
         ],
-        spacing=10,
     )
 
+def checklist_column(c_spacing=10) -> ft.Column:
+    controls_list = []
+    for item in CHECKLIST_ITEMS:
+        row = checklist_row(
+            item,  
+            size=14, 
+            color="white", 
+            icon_bgcolor="#7cb342", 
+            icon=ft.Icons.CHECK, 
+            icon_width=20, 
+            icon_height=20,
+        )
+        controls_list.append(row)
 
-def checklist_column() -> ft.Column:
     return ft.Column(
-        spacing=10,
-        controls=[check_item(t) for t in CHECKLIST_ITEMS],
+        spacing=c_spacing,
+        controls=controls_list,
     )
-
 
 def avatar(size: int = 180) -> ft.Container:
     return ft.Container(
@@ -100,22 +117,29 @@ def avatar(size: int = 180) -> ft.Container:
     )
 
 
-def services_row(alignment=ft.MainAxisAlignment.CENTER) -> ft.Row:
-    return ft.Row(
+def brand_row(alignment=ft.MainAxisAlignment.CENTER) -> ft.Row:
+    return ft.Column(
         alignment=alignment,
+        horizontal_alignment=alignment,
+        spacing=0,
         controls=[
-            ft.Text("Servicios Informáticos:", color="white", size=16),
-            ft.Text("ochopi tech", color="white", size=16,
-                    weight=ft.FontWeight.BOLD, italic=True),
+            ft.Text("+503 7419 6446", size=18, color="white", weight=ft.FontWeight.BOLD),
+            ft.Row(
+                alignment=alignment,
+                controls=[
+                    ft.Text("Servicios Informáticos:", color="white", size=16),
+                    ft.Text("ochopi tech", color="white", size=16, weight=ft.FontWeight.BOLD, italic=True),
+                ],
+            ),
         ],
     )
 
 
-def paragraph(text_str, align=ft.TextAlign.CENTER) -> ft.Text:
-    return ft.Text(text_str, color="white", size=16, text_align=align)
+def paragraph(text_str, align=ft.TextAlign.CENTER, size=16, color="white") -> ft.Text:
+    return ft.Text(text_str, text_align=align, size=size, color=color)
 
 
-# ---------- layout angosto (móvil / retrato) ----------
+# ---------- narrow layout (móvil) ----------
 
 def build_card_narrow(max_width: int = 380) -> ft.Container:
     return ft.Container(
@@ -125,23 +149,21 @@ def build_card_narrow(max_width: int = 380) -> ft.Container:
         gradient=GRADIENT,
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=18,
+            spacing=10,
             controls=[
-                avatar(180),
-                ft.Text("RAFAEL", size=42, color="white", weight=ft.FontWeight.W_300),
-                ft.Text("+503 7419 6446", size=20, color="white",
-                        weight=ft.FontWeight.BOLD),
-                services_row(),
-                icons_row(),
-                paragraph(PARAGRAPH_1),
-                paragraph(PARAGRAPH_2),
+                avatar(150),
+                ft.Text("RAFAEL", size=38, color="white", weight=ft.FontWeight.W_300),
+                brand_row(),
+                icons_row(spacing=12, alignment=ft.MainAxisAlignment.CENTER, size=20, width=40, height=40, border=ft.Border.all(1, "#00000000"), border_radius=24, bgcolor="#00000000"),
+                paragraph(PARAGRAPH_1, align=ft.TextAlign.CENTER, size=14, color="white"),
+                paragraph(PARAGRAPH_2, size=14),
                 checklist_column(),
             ],
         ),
     )
 
 
-# ---------- layout ancho (pc / tablet horizontal) ----------
+# ---------- wide layout (pc / tablet) ----------
 
 def build_card_wide(max_width: int = 900) -> ft.Container:
     header = ft.Row(
@@ -152,11 +174,8 @@ def build_card_wide(max_width: int = 900) -> ft.Container:
                 spacing=8,
                 expand=True,
                 controls=[
-                    ft.Text("RAFAEL", size=42, color="white",
-                            weight=ft.FontWeight.W_300),
-                    ft.Text("+503 7419 6446", size=20, color="white",
-                            weight=ft.FontWeight.BOLD),
-                    services_row(alignment=ft.MainAxisAlignment.START),
+                    ft.Text("RAFAEL", size=42, color="white", weight=ft.FontWeight.W_300),
+                    brand_row(alignment=ft.MainAxisAlignment.START),
                 ],
             ),
             avatar(170),
@@ -171,8 +190,8 @@ def build_card_wide(max_width: int = 900) -> ft.Container:
             ft.Column(
                 expand=2,
                 controls=[
-                    paragraph(PARAGRAPH_1),
-                    paragraph(PARAGRAPH_2),
+                    paragraph(PARAGRAPH_1, align=ft.TextAlign.CENTER, size=14, color="white"),
+                    paragraph(PARAGRAPH_2, size=14),
                 ],
             ),
         ],
@@ -187,8 +206,35 @@ def build_card_wide(max_width: int = 900) -> ft.Container:
             spacing=28,
             controls=[
                 header,
-                icons_row(),
+                icons_row(spacing=12, alignment=ft.MainAxisAlignment.CENTER, size=20, width=40, height=40, border_radius=24),
                 body,
             ],
         ),
+    )
+
+# ---------- punto de entrada único ----------
+ 
+# WIDE_BREAKPOINT < 700 usa el layout vertical (móvil/tablet en retrato);
+# igual o por encima, el layout horizontal (pc/tablet apaisada).
+WIDE_BREAKPOINT = 700
+ 
+ 
+def build_card(screen_width: float) -> ft.Control:
+    """Construye el card narrow/wide según el ancho de pantalla disponible."""
+    screen_width = screen_width or 380
+    is_wide = screen_width >= WIDE_BREAKPOINT
+ 
+    if is_wide:
+        # deja margen a los lados, tope de 900px para que no se estire demasiado en monitores enormes
+        card_width = min(900, screen_width - 64)
+        card = build_card_wide(max_width=card_width)
+    else:
+        card_width = min(480, screen_width - 32)
+        card = build_card_narrow(max_width=card_width)
+ 
+    return ft.Container(
+        content=card,
+        alignment=ft.Alignment.CENTER,
+        expand=True,
+        padding=ft.Padding.symmetric(vertical=24, horizontal=16),
     )
